@@ -47,8 +47,8 @@ Sigue estos pasos para poner en marcha el proyecto en un entorno de desarrollo l
 
 1.  **Clonar el Repositorio:**
     ```bash
-    git clone <URL_DEL_REPOSITORIO>
-    cd <NOMBRE_DE_LA_CARPETA_DEL_PROYECTO>
+    git clone https://github.com/AntoSalazar/DjangoFinal
+    cd DjangoFinal
     ```
 
 2.  **Crear y Activar un Entorno Virtual:**
@@ -119,17 +119,9 @@ Sigue estos pasos para poner en marcha el proyecto en un entorno de desarrollo l
 * `media/`: Directorio donde se almacenan las imágenes subidas (productos, categorías).
 * `venv/`: Directorio del entorno virtual (ignorado por Git).
 
-## Futuras Mejoras (To-Do)
 
-* Implementar un sistema de autenticación de usuarios completo (registro, inicio de sesión, perfiles de cliente).
-* Filtrado de productos por categoría en el catálogo.
-* Mejoras en el diseño y la experiencia de usuario (CSS más avanzado, JavaScript).
-* Integración con pasarelas de pago.
-* Búsqueda de productos.
-* Gestión de perfiles de cliente.
-* Historial de pedidos para clientes.
 
 ---
 *Este proyecto fue desarrollado como parte de la Práctica Final.*
-*Autor: [Tu Nombre/Alias - teracrow]*
-*Fecha: Mayo 2025*
+*Autor: Carlos Antonio Salazar Trinidad*
+*Fecha: 29 de Mayo 2025*
