@@ -3,91 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Shopping Cart</title>
+    <title>Your Shopping Cart - Ferretería Online</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .cart-actions form { display: inline; }
-        .total-row td { font-weight: bold; }
-        .messages { list-style: none; padding: 0; }
-        .messages li.success { background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 10px; border: 1px solid #c3e6cb; }
-        .messages li.error { background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 10px; border: 1px solid #f5c6cb; }
-        .product-image-cart { width: 50px; height: 50px; object-fit: cover; margin-right: 10px;}
-        .place-order-btn { background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-size: 1.1em;}
-        .empty-cart { text-align: center; padding: 20px; }
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --warning-color: #ffc107;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --link-hover-color: #0056b3;
+            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky; /* Para que el header se quede fijo */
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul { list-style: none; padding: 0; margin: 0; display: flex; }
+        nav ul li { margin-left: 1.5rem; }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #adb5bd; }
+        nav ul li a .cart-count {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.1em 0.4em;
+            font-size: 0.75em;
+            position: absolute;
+            top: -5px;
+            right: -10px;
+        }
+
+        .messages-container { max-width: 1200px; margin: 1rem auto; padding: 0 2rem; }
+        .messages { list-style: none; padding: 0; margin: 0; }
+        .messages li { padding: 0.75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: 0.25rem; }
+        .messages li.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .messages li.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .messages li.info { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
+
+        .main-content {
+            max-width: 1000px; /* Contenido del carrito un poco más estrecho */
+            margin: 2rem auto;
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        .main-content h1 {
+            font-size: 1.8rem;
+            color: var(--dark-gray);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .cart-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 2rem; border: 1px solid var(--border-color); border-radius: .25rem;}
+        .cart-table th, .cart-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .cart-table th { background-color: var(--light-gray); font-weight: 600; }
+        .cart-table td { vertical-align: middle; }
+        .cart-table tr:last-child td { border-bottom: none; }
+
+        .product-info { display: flex; align-items: center; }
+        .product-image-cart {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-right: 1rem;
+            border-radius: 0.25rem;
+            border: 1px solid var(--border-color);
+        }
+        .product-name { font-weight: 500; }
+
+        .cart-actions input[type="number"] {
+            width: 60px;
+            padding: 0.375rem 0.5rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+        }
+
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.375rem 0.75rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+        .btn:hover { background-color: var(--link-hover-color); border-color: var(--link-hover-color); }
+        .btn-sm { padding: 0.25rem 0.5rem; font-size: 0.8rem; }
+        .btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); }
+        .btn-danger:hover { background-color: #c82333; border-color: #bd2130; }
+        .btn-secondary { background-color: var(--secondary-color); border-color: var(--secondary-color); }
+        .btn-secondary:hover { background-color: #545b62; border-color: #4e555b; }
+        .btn-success { background-color: var(--success-color); border-color: var(--success-color); }
+        .btn-success:hover { background-color: #1e7e34; border-color: #1c7430; }
+        
+        .cart-summary {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 2px solid var(--primary-color);
+            text-align: right;
+        }
+        .cart-summary p {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .cart-summary .grand-total { color: var(--primary-color); }
+
+        .cart-navigation { margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; }
+        
+        .empty-cart-container { text-align: center; padding: 3rem 1rem; }
+        .empty-cart-container p { font-size: 1.1rem; margin-bottom: 1.5rem; }
+        .empty-cart-container .icon { font-size: 4rem; color: var(--secondary-color); margin-bottom: 1rem; } /* Necesitarías un ícono SVG o FontAwesome */
+
+
+        footer { text-align: center; padding: 2rem; margin-top: 2rem; background-color: var(--dark-gray); color: #adb5bd; font-size: 0.9rem; }
+
+        /* Responsive Table - Horizontal Scroll on small screens */
+        .table-responsive-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        }
+
+        @media (max-width: 768px) {
+            .main-content { padding: 1rem; margin: 1rem; }
+            .main-content h1 { font-size: 1.5rem; }
+            .cart-table th, .cart-table td { padding: 0.5rem; font-size: 0.9rem; }
+            .product-image-cart { width: 40px; height: 40px; margin-right: 0.5rem; }
+            .cart-actions input[type="number"] { width: 45px; }
+            .btn { font-size: 0.85rem; padding: 0.3rem 0.6rem; }
+            nav { flex-direction: column; align-items: flex-start; }
+            nav ul { margin-top: 1rem; width: 100%; justify-content: space-around; }
+            nav ul li { margin-left: 0; margin-right: 1rem; }
+            .cart-navigation { flex-direction: column; }
+            .cart-navigation a, .cart-navigation form { margin-bottom: 1rem; width: 100%; text-align: center;}
+            .cart-summary { text-align: center; }
+            .cart-summary form button { width: 100%; }
+        }
+         @media (max-width: 480px) {
+            nav ul li a .cart-count { font-size: 0.7em; top: -3px; right: -7px;}
+         }
+
     </style>
 </head>
 <body>
-    <h1>Your Shopping Cart</h1>
 
-    <p><a href="{% url 'product_list' %}">&laquo; Continue Shopping</a></p>
-
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    {% if cart_items %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th></th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Total</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in cart_items %}
-                <tr>
-                    <td>
-                        {% if item.idproduct.image %}
-                            <img src="{{ item.idproduct.image.url }}" alt="{{ item.idproduct.name }}" class="product-image-cart">
+    <header>
+        <nav>
+            <a href="{% url 'product_list' %}" class="brand-logo">Ferretería Online</a>
+            <ul>
+                <li><a href="{% url 'product_list' %}">Products</a></li>
+                <li>
+                    <a href="{% url 'view_cart' %}" class="active">
+                        Cart
+                        {% if cart_item_count > 0 %}
+                            <span class="cart-count">{{ cart_item_count }}</span>
                         {% endif %}
-                    </td>
-                    <td>{{ item.idproduct.name }}</td>
-                    <td>${{ item.idproduct.price }}</td>
-                    <td class="cart-actions">
-                        <form method="post" action="{% url 'update_cart_item' item.idcart %}">
-                            {% csrf_token %}
-                            <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.idproduct.stock }}" style="width: 50px;" required>
-                            <button type="submit">Update</button>
-                        </form>
-                    </td>
-                    <td>${{ item.total_item_price|floatformat:2 }}</td>
-                    <td class="cart-actions">
-                        <form method="post" action="{% url 'remove_cart_item' item.idcart %}" onsubmit="return confirm('Are you sure you want to remove this item?');">
-                            {% csrf_token %}
-                            <button type="submit">Remove</button>
-                        </form>
-                    </td>
-                </tr>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="messages-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
                 {% endfor %}
-                <tr class="total-row">
-                    <td colspan="4" style="text-align: right;"><strong>Grand Total:</strong></td>
-                    <td colspan="2"><strong>${{ total_cart_price|floatformat:2 }}</strong></td>
-                </tr>
-            </tbody>
-        </table>
-        <div style="text-align: right;">
-            <form method="post" action="{% url 'place_order' %}">
-                {% csrf_token %}
-                <button type="submit" class="place-order-btn">Place Order</button>
-            </form>
-        </div>
-    {% else %}
-        <div class="empty-cart">
-            <p>Your cart is empty.</p>
-            <p><a href="{% url 'product_list' %}" class="place-order-btn" style="background-color: #007bff;">Shop for Products</a></p>
-        </div>
-    {% endif %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <main class="main-content">
+        <h1>Your Shopping Cart</h1>
+
+        {% if cart_items %}
+            <div class="cart-navigation">
+                <a href="{% url 'product_list' %}" class="btn btn-secondary">&laquo; Continue Shopping</a>
+            </div>
+            <div class="table-responsive-container"> <table class="cart-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2">Product</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in cart_items %}
+                        <tr>
+                            <td style="width: 70px;">
+                                {% if item.idproduct.image %}
+                                    <img src="{{ item.idproduct.image.url }}" alt="{{ item.idproduct.name }}" class="product-image-cart">
+                                {% else %}
+                                    <img src="https://via.placeholder.com/60?text=N/A" alt="No image" class="product-image-cart">
+                                {% endif %}
+                            </td>
+                            <td><span class="product-name">{{ item.idproduct.name }}</span></td>
+                            <td>${{ item.idproduct.price|floatformat:2 }}</td>
+                            <td class="cart-actions">
+                                <form method="post" action="{% url 'update_cart_item' item.idcart %}">
+                                    {% csrf_token %}
+                                    <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.idproduct.stock }}" required>
+                                    <button type="submit" class="btn btn-sm">Update</button>
+                                </form>
+                            </td>
+                            <td>${{ item.total_item_price|floatformat:2 }}</td>
+                            <td class="cart-actions">
+                                <form method="post" action="{% url 'remove_cart_item' item.idcart %}" onsubmit="return confirm('Are you sure you want to remove this item?');">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cart-summary">
+                <p>Grand Total: <span class="grand-total">${{ total_cart_price|floatformat:2 }}</span></p>
+                <form method="post" action="{% url 'place_order' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success" style="font-size: 1.1em; padding: 0.75rem 1.5rem;">Place Order</button>
+                </form>
+            </div>
+
+        {% else %}
+            <div class="empty-cart-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-cart3" viewBox="0 0 16 16" style="color: var(--secondary-color); margin-bottom: 1rem;">
+                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .49.598l-1 5a.5.5 0 0 1-.465.401l-9.397.472L4.777 9.5H13.5a.5.5 0 0 1 0 1H4.223l-.228.947A.5.5 0 0 1 3.5 12h8.5a.5.5 0 0 1 0 1H3.5a1.5 1.5 0 0 1-1.489-1.314L.04 2.707A.5.5 0 0 1 0 2.5zm3.915 10L3.102 4h10.796l.826 4.126zM5 12.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m8 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5m-5 0a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5"/>
+                </svg>
+                <p>Your shopping cart is currently empty.</p>
+                <p>Looks like you haven't added any products yet. Head back to our catalog to find something you like!</p>
+                <a href="{% url 'product_list' %}" class="btn btn-primary" style="font-size: 1.1em;">Shop for Products</a>
+            </div>
+        {% endif %}
+    </main>
+
+    <footer>
+        <p>&copy; {% now "Y" %} Ferretería Online. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>

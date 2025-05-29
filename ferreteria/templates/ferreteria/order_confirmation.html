@@ -3,27 +3,214 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Confirmation</title>
+    <title>Order Confirmed - Ferretería Online</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .confirmation-box { border: 1px solid #28a745; padding: 20px; margin: 20px auto; max-width: 700px; background-color: #e9f7ef; }
-        h1 { color: #155724; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #d4edda; }
-        .total-row td { font-weight: bold; }
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8; /* Un color para información */
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --link-hover-color: #0056b3;
+            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul { list-style: none; padding: 0; margin: 0; display: flex; }
+        nav ul li { margin-left: 1.5rem; }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #adb5bd; }
+        nav ul li a .cart-count {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.1em 0.4em;
+            font-size: 0.75em;
+            position: absolute;
+            top: -5px;
+            right: -10px;
+        }
+        
+        .messages-container { max-width: 1200px; margin: 1rem auto; padding: 0 2rem; }
+        .messages { list-style: none; padding: 0; margin: 0; }
+        .messages li { padding: 0.75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: 0.25rem; }
+        .messages li.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .messages li.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .messages li.info { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
+
+
+        .main-content {
+            max-width: 800px; /* Contenido de confirmación más centrado */
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: var(--card-shadow);
+            text-align: center; /* Centrar el contenido de la caja de confirmación */
+        }
+
+        .confirmation-icon {
+            font-size: 4rem; /* Tamaño grande para el ícono */
+            color: var(--success-color);
+            margin-bottom: 1rem;
+        }
+
+        .main-content h1 {
+            font-size: 2rem;
+            color: var(--success-color); /* Color de éxito para el título */
+            margin-top: 0;
+            margin-bottom: 1rem;
+        }
+        .main-content h2 {
+            font-size: 1.3rem;
+            color: var(--dark-gray);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            text-align: left; /* Subtítulo del resumen a la izquierda */
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .order-details-text p {
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            text-align: left; /* Detalles del pedido a la izquierda */
+        }
+        .order-details-text strong {
+            color: var(--dark-gray);
+        }
+
+        .summary-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 1rem; border: 1px solid var(--border-color); border-radius: .25rem;}
+        .summary-table th, .summary-table td { padding: 0.75rem 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .summary-table th { background-color: var(--light-gray); font-weight: 600; }
+        .summary-table tr:last-child td { border-bottom: none; }
+        .summary-table .total-row td { font-weight: bold; font-size: 1.1rem; }
+        .summary-table .grand-total { color: var(--success-color); }
+
+        .actions { margin-top: 2.5rem; }
+        .btn {
+            display: inline-block;
+            font-weight: 500;
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.6rem 1.2rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+        }
+        .btn:hover { background-color: var(--link-hover-color); border-color: var(--link-hover-color); }
+
+
+        footer { text-align: center; padding: 2rem; margin-top: 2rem; background-color: var(--dark-gray); color: #adb5bd; font-size: 0.9rem; }
+
+        @media (max-width: 768px) {
+            .main-content { margin: 1rem; padding: 1.5rem; }
+            .main-content h1 { font-size: 1.6rem; }
+            .summary-table th, .summary-table td { padding: 0.5rem; font-size: 0.9rem; }
+            nav { flex-direction: column; align-items: flex-start; }
+            nav ul { margin-top: 1rem; width: 100%; justify-content: space-around; }
+            nav ul li { margin-left: 0; margin-right: 1rem; }
+        }
+        @media (max-width: 480px) {
+            nav ul li a .cart-count { font-size: 0.7em; top: -3px; right: -7px;}
+        }
     </style>
 </head>
 <body>
-    <div class="confirmation-box">
-        <h1>Order Confirmed!</h1>
-        <p>Thank you for your purchase, {{ order.idclients.name }} {{ order.idclients.lastname }}.</p>
-        <p><strong>Order Number:</strong> #{{ order.idorders }}</p>
-        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
-        <p><strong>Status:</strong> {{ order.state }}</p>
 
-        <h2>Order Summary:</h2>
-        <table>
+    <header>
+        <nav>
+            <a href="{% url 'product_list' %}" class="brand-logo">Ferretería Online</a>
+            <ul>
+                <li><a href="{% url 'product_list' %}">Products</a></li>
+                <li>
+                    <a href="{% url 'view_cart' %}">
+                        Cart
+                        {% if cart_item_count > 0 %}
+                            <span class="cart-count">{{ cart_item_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+    
+    <div class="messages-container">
+        {% if messages %} <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+
+    <main class="main-content">
+        <div class="confirmation-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-check-circle-fill" viewBox="0 0 16 16">
+                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+            </svg>
+        </div>
+
+        <h1>Order Confirmed!</h1>
+        <p>Thank you for your purchase, <strong>{{ order.idclients.name }} {{ order.idclients.lastname }}</strong>.</p>
+        <p>Your order has been placed successfully and is now being processed.</p>
+
+        <div class="order-details-text">
+            <p><strong>Order Number:</strong> #{{ order.idorders }}</p>
+            <p><strong>Order Date:</strong> {{ order.order_date|date:"F d, Y" }}</p> <p><strong>Status:</strong> <span style="text-transform: capitalize; font-weight:500; color: var(--info-color);">{{ order.state }}</span></p>
+        </div>
+
+        <h2>Order Summary</h2>
+        <table class="summary-table">
             <thead>
                 <tr>
                     <th>Product</th>
@@ -38,17 +225,23 @@
                     <td>{{ detail.idproducts.name }}</td>
                     <td>{{ detail.quantity }}</td>
                     <td>${{ detail.unit_price|floatformat:2 }}</td>
-                    <td>${{ detail.total_item_price|floatformat:2 }}</td>
-                </tr>
+                    <td>${{ detail.total_item_price|floatformat:2 }}</td> </tr>
                 {% endfor %}
                 <tr class="total-row">
                     <td colspan="3" style="text-align:right;"><strong>Grand Total:</strong></td>
-                    <td><strong>${{ total_order_price|floatformat:2 }}</strong></td>
+                    <td><strong class="grand-total">${{ total_order_price|floatformat:2 }}</strong></td>
                 </tr>
             </tbody>
         </table>
-        <br>
-        <p><a href="{% url 'product_list' %}">Continue Shopping</a></p>
-    </div>
+
+        <div class="actions">
+            <a href="{% url 'product_list' %}" class="btn">Continue Shopping</a>
+            </div>
+    </main>
+
+    <footer>
+        <p>&copy; {% now "Y" %} Ferretería Online. All rights reserved.</p>
+    </footer>
+
 </body>
 </html>

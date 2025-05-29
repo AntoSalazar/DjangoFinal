@@ -6,12 +6,30 @@ from django.utils import timezone # Your existing import
 from django.db.models import F, Sum # Your existing import
 from django.db import transaction # <<<<<< ADD THIS LINE
 
-def product_list(request):
-    products = Products.objects.all()
-    categories = Categories.objects.all()
+def product_list(request, category_id=None): # category_id ahora es un parámetro opcional
+    categories = Categories.objects.all().order_by('name')
+    current_category = None # Para saber qué categoría está activa
+
+    if category_id:
+        current_category = get_object_or_404(Categories, idcategories=category_id)
+        products = Products.objects.filter(idcategories=current_category).order_by('name')
+    else:
+        products = Products.objects.all().order_by('name')
+
+    # Lógica para el contador del carrito (como la tenías antes)
+    cart_item_count = 0
+    try:
+        client = get_current_client(request) # Asumiendo que tienes esta función
+        if client:
+            cart_item_count = Cart.objects.filter(idclient=client).aggregate(total_items=Sum('quantity'))['total_items'] or 0
+    except Exception:
+        pass
+
     context = {
         'products': products,
         'categories': categories,
+        'current_category': current_category, # Pasa la categoría actual a la plantilla
+        'cart_item_count': cart_item_count,
     }
     return render(request, 'ferreteria/index.html', context)
 
@@ -80,17 +98,25 @@ def get_current_client(request):
 
 
 def view_cart(request):
-    client = get_current_client(request)
-    cart_items = Cart.objects.filter(idclient=client).select_related('idproduct') # select_related para optimizar
-    
+    client = get_current_client(request) # Asume que esta función existe y funciona
+    cart_items_queryset = Cart.objects.filter(idclient=client).select_related('idproduct')
+
+    # Calcular el conteo total de ítems para la cabecera (suma de cantidades)
+    header_cart_item_count = cart_items_queryset.aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
+    # Si prefieres contar productos distintos:
+    # header_cart_item_count = cart_items_queryset.count()
+
+    processed_cart_items = []
     total_cart_price = 0
-    for item in cart_items:
+    for item in cart_items_queryset:
         item.total_item_price = item.quantity * item.idproduct.price
         total_cart_price += item.total_item_price
+        processed_cart_items.append(item)
         
     context = {
-        'cart_items': cart_items,
+        'cart_items': processed_cart_items,
         'total_cart_price': total_cart_price,
+        'cart_item_count': header_cart_item_count, # << AÑADIR ESTO PARA LA CABECERA
     }
     return render(request, 'ferreteria/cart_view.html', context)
 
@@ -180,22 +206,32 @@ def place_order(request):
 
 def order_confirmation(request, order_id):
     order = get_object_or_404(Orders, idorders=order_id)
-    client = get_current_client(request) # Para asegurar que el cliente solo vea sus pedidos (opcional para esta página simple)
+    client = get_current_client(request) # Asume que esta función existe y funciona
 
-    if order.idclients != client: # Simple check
+    # Verificar que el cliente viendo la confirmación sea el dueño del pedido
+    if order.idclients != client:
         messages.error(request, "You are not authorized to view this order confirmation.")
-        return redirect('product_list')
+        return redirect('product_list') # O a donde consideres apropiado
         
-    order_details = OrderDetail.objects.filter(idorders=order).select_related('idproducts')
+    order_details_queryset = OrderDetail.objects.filter(idorders=order).select_related('idproducts')
     
+    processed_order_details = []
     total_order_price = 0
-    for detail in order_details:
-        detail.total_item_price = detail.quantity * detail.unit_price
+    for detail in order_details_queryset:
+        detail.total_item_price = detail.quantity * detail.unit_price # Calcula el total por ítem
         total_order_price += detail.total_item_price
+        processed_order_details.append(detail)
+
+    # Obtener el conteo actual de ítems en el carrito (para la cabecera)
+    # Este sería un nuevo carrito o ítems que quedaron/se añadieron después de este pedido.
+    header_cart_item_count = 0
+    if client: # Solo si tenemos un cliente
+        header_cart_item_count = Cart.objects.filter(idclient=client).aggregate(total_quantity=Sum('quantity'))['total_quantity'] or 0
 
     context = {
         'order': order,
-        'order_details': order_details,
+        'order_details': processed_order_details,
         'total_order_price': total_order_price,
+        'cart_item_count': header_cart_item_count, # << AÑADIR ESTO PARA LA CABECERA
     }
     return render(request, 'ferreteria/order_confirmation.html', context)

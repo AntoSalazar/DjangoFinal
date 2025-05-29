@@ -3,77 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Catalog</title>
+    <title>Product Catalog - Ferretería Online</title>
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        .container { display: flex; }
-        .sidebar { width: 20%; padding-right: 20px; }
-        .products { width: 80%; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
-        .product-card { border: 1px solid #ddd; padding: 15px; text-align: center; }
-        .product-card img { max-width: 100%; height: 150px; object-fit: cover; margin-bottom: 10px; }
-        .messages { list-style: none; padding: 0; }
-        .messages li.success { background-color: #d4edda; color: #155724; padding: 10px; margin-bottom: 10px; border: 1px solid #c3e6cb; }
-        .messages li.error { background-color: #f8d7da; color: #721c24; padding: 10px; margin-bottom: 10px; border: 1px solid #f5c6cb; }
+        :root {
+            --primary-color: #007bff; /* Azul Bootstrap */
+            --secondary-color: #6c757d; /* Gris secundario */
+            --success-color: #28a745; /* Verde éxito */
+            --danger-color: #dc3545; /* Rojo peligro */
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --link-hover-color: #0056b3;
+            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f9; /* Un gris muy claro para el fondo */
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 1.5rem;
+        }
+
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        nav ul li a:hover, nav ul li a.active {
+            color: #adb5bd; /* Un gris más claro para hover */
+        }
+        nav ul li a .cart-count {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.1em 0.4em;
+            font-size: 0.75em;
+            position: absolute;
+            top: -5px;
+            right: -10px;
+        }
+
+
+        .messages-container {
+            max-width: 1200px;
+            margin: 1rem auto;
+            padding: 0 2rem;
+        }
+        .messages { list-style: none; padding: 0; margin: 0; }
+        .messages li {
+            padding: 0.75rem 1.25rem;
+            margin-bottom: 1rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+        }
+        .messages li.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .messages li.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .messages li.info { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
+
+
+        .main-container {
+            display: flex;
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem; /* Espacio a los lados en pantallas más pequeñas */
+        }
+
+        .sidebar {
+            width: 20%;
+            min-width: 200px; /* Mínimo ancho para la barra lateral */
+            padding-right: 2rem;
+            border-right: 1px solid var(--border-color);
+        }
+        .sidebar h2 {
+            font-size: 1.3rem;
+            color: var(--dark-gray);
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+        .sidebar ul { list-style: none; padding: 0; }
+        .sidebar ul li a {
+            display: flex; /* Para alinear imagen y texto */
+            align-items: center; /* Centrado vertical */
+            text-decoration: none;
+            color: var(--text-color);
+            padding: 0.6rem 0.3rem;
+            border-radius: 0.25rem;
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+        }
+        .sidebar ul li a:hover, .sidebar ul li a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .sidebar ul li img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            margin-right: 0.75rem;
+        }
+
+        .products-main {
+            width: 80%;
+            padding-left: 1rem; /* Espacio después de la barra lateral */
+        }
+        .products-main h1 {
+            font-size: 2rem;
+            color: var(--dark-gray);
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); /* Tarjetas un poco más pequeñas */
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem; /* Bordes más redondeados */
+            padding: 1rem;
+            text-align: center;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Para que el botón quede abajo */
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .product-card .image-placeholder {
+            height: 180px; /* Altura fija para la imagen */
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+            border-radius: 0.25rem;
+            margin-bottom: 1rem;
+        }
+        .product-card img {
+            max-width: 100%;
+            height: 180px; /* Altura fija */
+            object-fit: contain; /* 'contain' para ver toda la imagen sin cortar */
+            margin-bottom: 1rem;
+            border-radius: 0.25rem;
+        }
+        .product-card h3 {
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+            color: var(--text-color);
+        }
+        .product-card .description {
+            font-size: 0.85rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.75rem;
+            min-height: 40px; /* Para alinear un poco las descripciones */
+        }
+        .product-card .price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+        .product-card .stock {
+            font-size: 0.8rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.75rem;
+        }
+        .product-card .out-of-stock {
+            font-size: 0.9rem;
+            color: var(--danger-color);
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .product-card form {
+            margin-top: auto; /* Empuja el formulario hacia abajo */
+        }
+        .product-card label {
+            font-size: 0.85rem;
+            margin-right: 0.5rem;
+        }
+        .product-card input[type="number"] {
+            width: 60px;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            margin-bottom: 0.75rem;
+            box-sizing: border-box; /* Importante para que el padding no aumente el ancho */
+        }
+        .product-card .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: white;
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            border-radius: 0.25rem;
+            text-decoration: none;
+            transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            width: 100%; /* Botón ocupa todo el ancho */
+        }
+        .product-card .btn:hover {
+            background-color: var(--link-hover-color);
+            border-color: var(--link-hover-color);
+        }
+        .product-card .btn:disabled {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            cursor: not-allowed;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            background-color: var(--dark-gray);
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            .sidebar, .products-main {
+                width: 100%;
+                padding-right: 0;
+                padding-left: 0;
+                border-right: none;
+            }
+            .sidebar {
+                margin-bottom: 2rem;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 1rem;
+            }
+            nav {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            nav ul {
+                margin-top: 1rem;
+                width: 100%;
+                justify-content: space-around; /* O flex-start */
+            }
+            nav ul li { margin-left: 0; margin-right: 1rem; /* Ajustar espaciado */ }
+            .products-main h1 { font-size: 1.5rem; }
+        }
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr; /* Una columna en pantallas muy pequeñas */
+            }
+            nav ul li a .cart-count { font-size: 0.7em; top: -3px; right: -7px;}
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>Our Products</h1>
+    <header>
+        <nav>
+            <a href="{% url 'product_list' %}" class="brand-logo">Ferretería Online</a>
+            <ul>
+                <li><a href="{% url 'product_list' %}" class="active">Products</a></li>
+                <li>
+                    <a href="{% url 'view_cart' %}">
+                        Cart
+                        {% if cart_item_count > 0 %}
+                            <span class="cart-count">{{ cart_item_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+                </ul>
+        </nav>
+    </header>
 
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li class="{{ message.tags }}">{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    <div class="messages-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 
-    <div class="container">
+    <div class="main-container">
         <aside class="sidebar">
             <h2>Categories</h2>
             <ul>
-                <li><a href="{% url 'product_list' %}">All Products</a></li>
-                {% for category in categories %}
+                <li>
+                    <a href="{% url 'product_list' %}" class="{% if not current_category %}active{% endif %}">All Products</a>
+                </li>
+                {% for category_item in categories %} {# Cambiado a category_item para evitar conflicto con variable de contexto #}
                     <li>
-                        <a href="#"> {% if category.image %}
-                                <img src="{{ category.image.url }}" alt="{{ category.name }}" style="width: 20px; height: 20px; vertical-align: middle;">
+                        <a href="{% url 'product_list_by_category' category_item.idcategories %}" class="{% if current_category and current_category.idcategories == category_item.idcategories %}active{% endif %}">
+                            {% if category_item.image %}
+                                <img src="{{ category_item.image.url }}" alt="{{ category_item.name }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/24?text=C" alt="Category icon">
                             {% endif %}
-                            {{ category.name }}
+                            {{ category_item.name }}
                         </a>
                     </li>
                 {% endfor %}
             </ul>
         </aside>
 
-        <main class="products">
-            {% for product in products %}
-                <div class="product-card">
-                    {% if product.image %}
-                        <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                    {% else %}
-                        <div style="height: 150px; background: #eee; display: flex; align-items: center; justify-content: center;">No Image</div>
-                    {% endif %}
-                    <h3>{{ product.name }}</h3>
-                    <p>{{ product.description|truncatewords:15 }}</p>
-                    <p><strong>Price:</strong> ${{ product.price }}</p>
-                    {% if product.stock > 0 %}
-                        <p>Stock: {{ product.stock }}</p>
-                        <form method="post" action="{% url 'add_to_cart' product.idproducts %}">
-                            {% csrf_token %}
-                            <label for="quantity_prod_{{ product.idproducts }}">Quantity:</label>
-                            <input type="number" name="quantity" value="1" min="1" {% if product.stock %}max="{{ product.stock }}"{% endif %} id="quantity_prod_{{ product.idproducts }}" style="width: 60px; margin-bottom: 10px;">
-                            <br>
-                            <button type="submit">Add to Cart</button>
-                        </form>
-                    {% else %}
-                        <p style="color: red;">Out of Stock</p>
-                    {% endif %}
-                </div>
-            {% empty %}
-                <p>No products available at the moment.</p>
-            {% endfor %}
+        <main class="products-main">
+            <h1>Our Products</h1>
+            <div class="products-grid">
+                {% for product in products %}
+                    <div class="product-card">
+                        <div> {% if product.image %}
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="image-placeholder">No Image</div>
+                            {% endif %}
+                            <h3>{{ product.name }}</h3>
+                            <p class="description">{{ product.description|truncatewords:12 }}</p>
+                            <p class="price">${{ product.price|floatformat:2 }}</p>
+                        </div>
+                        <div> {% if product.stock > 0 %}
+                                <p class="stock">Stock: {{ product.stock }}</p>
+                                <form method="post" action="{% url 'add_to_cart' product.idproducts %}">
+                                    {% csrf_token %}
+                                    <label for="quantity_prod_{{ product.idproducts }}">Qty:</label>
+                                    <input type="number" name="quantity" value="1" min="1" {% if product.stock %}max="{{ product.stock }}"{% endif %} id="quantity_prod_{{ product.idproducts }}">
+                                    <button type="submit" class="btn">Add to Cart</button>
+                                </form>
+                            {% else %}
+                                <p class="out-of-stock">Out of Stock</p>
+                                <button type="button" class="btn" disabled>Add to Cart</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p>No products available at the moment.</p>
+                {% endfor %}
+            </div>
         </main>
     </div>
+
+    <footer>
+        <p>&copy; {% now "Y" %} Ferretería Online. All rights reserved.</p>
+    </footer>
 
 </body>
 </html>
