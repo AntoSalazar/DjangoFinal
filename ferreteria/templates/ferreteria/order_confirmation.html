@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        .confirmation-box { border: 1px solid #28a745; padding: 20px; margin: 20px auto; max-width: 700px; background-color: #e9f7ef; }
+        h1 { color: #155724; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #d4edda; }
+        .total-row td { font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="confirmation-box">
+        <h1>Order Confirmed!</h1>
+        <p>Thank you for your purchase, {{ order.idclients.name }} {{ order.idclients.lastname }}.</p>
+        <p><strong>Order Number:</strong> #{{ order.idorders }}</p>
+        <p><strong>Order Date:</strong> {{ order.order_date }}</p>
+        <p><strong>Status:</strong> {{ order.state }}</p>
+
+        <h2>Order Summary:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for detail in order_details %}
+                <tr>
+                    <td>{{ detail.idproducts.name }}</td>
+                    <td>{{ detail.quantity }}</td>
+                    <td>${{ detail.unit_price|floatformat:2 }}</td>
+                    <td>${{ detail.total_item_price|floatformat:2 }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="3" style="text-align:right;"><strong>Grand Total:</strong></td>
+                    <td><strong>${{ total_order_price|floatformat:2 }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <p><a href="{% url 'product_list' %}">Continue Shopping</a></p>
+    </div>
+</body>
+</html>
