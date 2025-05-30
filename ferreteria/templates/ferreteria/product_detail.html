@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ product.name }} - Ferretería Online</title>
+    <style>
+        :root {
+            --primary-color: #007bff; /* Azul Bootstrap */
+            --secondary-color: #6c757d; /* Gris secundario */
+            --success-color: #28a745; /* Verde éxito */
+            --danger-color: #dc3545; /* Rojo peligro */
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+            --border-color: #dee2e6;
+            --text-color: #212529;
+            --link-hover-color: #0056b3;
+            --card-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f6f9;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--dark-gray);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav .brand-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-decoration: none;
+        }
+
+        nav ul { list-style: none; padding: 0; margin: 0; display: flex; }
+        nav ul li { margin-left: 1.5rem; }
+        nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+        }
+        nav ul li a:hover, nav ul li a.active { color: #adb5bd; }
+        nav ul li a .cart-count {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            padding: 0.1em 0.4em;
+            font-size: 0.75em;
+            position: absolute;
+            top: -5px;
+            right: -10px;
+        }
+
+        .messages-container { max-width: 1200px; margin: 1rem auto; padding: 0 2rem; }
+        .messages { list-style: none; padding: 0; margin: 0; }
+        .messages li { padding: 0.75rem 1.25rem; margin-bottom: 1rem; border: 1px solid transparent; border-radius: 0.25rem; }
+        .messages li.success { background-color: #d4edda; color: #155724; border-color: #c3e6cb; }
+        .messages li.error { background-color: #f8d7da; color: #721c24; border-color: #f5c6cb; }
+        .messages li.info { background-color: #cce5ff; color: #004085; border-color: #b8daff; }
+
+        .product-detail-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 0.375rem;
+            box-shadow: var(--card-shadow);
+            display: grid;
+            grid-template-columns: 1fr; /* Default to 1 column */
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) { /* 2 columns for wider screens */
+            .product-detail-container {
+                grid-template-columns: 2fr 3fr; /* Image column, Info column */
+            }
+        }
+
+        .product-image-section img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 0.25rem;
+            border: 1px solid var(--border-color);
+        }
+        .product-image-section .image-placeholder-detail {
+            width: 100%;
+            height: 300px;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--secondary-color);
+            border-radius: 0.25rem;
+            font-size: 1.2rem;
+        }
+
+
+        .product-info-section h1 {
+            font-size: 2rem;
+            color: var(--dark-gray);
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+        .product-info-section .category-name {
+            font-size: 0.9rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+            display: block; /* Para que el margen inferior funcione bien */
+        }
+         .product-info-section .category-name a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        .product-info-section .category-name a:hover {
+            text-decoration: underline;
+        }
+
+        .product-info-section .description {
+            font-size: 1rem;
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+        .product-info-section .price {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+        .product-info-section .stock {
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+        .product-info-section .stock .in-stock { color: var(--success-color); font-weight: 500;}
+        .product-info-section .stock .low-stock { color: #fd7e14; font-weight: 500;} /* Naranja para bajo stock */
+        .product-info-section .out-of-stock {
+            font-size: 1rem;
+            color: var(--danger-color);
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-info-section form label {
+            font-size: 0.9rem;
+            margin-right: 0.5rem;
+            font-weight: 500;
+        }
+        .product-info-section form input[type="number"] {
+            width: 70px;
+            padding: 0.5rem 0.75rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.25rem;
+            margin-right: 1rem; /* Espacio antes del botón */
+            box-sizing: border-box;
+        }
+        .product-info-section form .btn {
+            padding: 0.6rem 1.5rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            /* width: auto;  No necesita ser 100% aquí */
+        }
+         .product-info-section form .btn:disabled {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            cursor: not-allowed;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            margin-top: 2rem;
+            background-color: var(--dark-gray);
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav>
+            <a href="{% url 'product_list' %}" class="brand-logo">Ferretería Online</a>
+            <ul>
+                <li><a href="{% url 'product_list' %}" class="{% if request.resolver_match.url_name == 'product_list' and not current_category %}active{% endif %}">Products</a></li>
+                <li>
+                    <a href="{% url 'view_cart' %}">
+                        Cart
+                        {% if cart_item_count > 0 %}
+                            <span class="cart-count">{{ cart_item_count }}</span>
+                        {% endif %}
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="messages-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="{{ message.tags }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <main class="product-detail-container">
+        <section class="product-image-section">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            {% else %}
+                <div class="image-placeholder-detail">No Image Available</div>
+            {% endif %}
+        </section>
+
+        <section class="product-info-section">
+            <a href="{% url 'product_list' %}" class="back-link">&laquo; Back to Products</a>
+            
+            <h1>{{ product.name }}</h1>
+
+            {% if product.idcategories %}
+            <span class="category-name">
+                Categoría: <a href="{% url 'product_list_by_category' product.idcategories.idcategories %}">{{ product.idcategories.name }}</a>
+            </span>
+            {% endif %}
+
+            <p class="price">${{ product.price|floatformat:2 }}</p>
+            
+            <p class="description">{{ product.description|linebreaksbr }}</p>
+
+            {% if product.stock > 0 %}
+                <p class="stock">
+                    {% if product.stock > 10 %}
+                        <span class="in-stock">Stock: {{ product.stock }} available</span>
+                    {% elif product.stock > 0 %}
+                        <span class="low-stock">Stock: Only {{ product.stock }} left!</span>
+                    {% endif %}
+                </p>
+                <form method="post" action="{% url 'add_to_cart' product.idproducts %}">
+                    {% csrf_token %}
+                    <label for="quantity_prod_{{ product.idproducts }}">Quantity:</label>
+                    <input type="number" name="quantity" value="1" min="1" {% if product.stock %}max="{{ product.stock }}"{% endif %} id="quantity_prod_{{ product.idproducts }}" required>
+                    <button type="submit" class="btn">Add to Cart</button>
+                </form>
+            {% else %}
+                <p class="out-of-stock">Out of Stock</p>
+                <button type="button" class="btn" disabled>Add to Cart</button>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; {% now "Y" %} Ferretería Online. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

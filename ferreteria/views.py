@@ -16,10 +16,10 @@ def product_list(request, category_id=None): # category_id ahora es un parámetr
     else:
         products = Products.objects.all().order_by('name')
 
-    # Lógica para el contador del carrito (como la tenías antes)
+    
     cart_item_count = 0
     try:
-        client = get_current_client(request) # Asumiendo que tienes esta función
+        client = get_current_client(request) 
         if client:
             cart_item_count = Cart.objects.filter(idclient=client).aggregate(total_items=Sum('quantity'))['total_items'] or 0
     except Exception:
@@ -235,3 +235,25 @@ def order_confirmation(request, order_id):
         'cart_item_count': header_cart_item_count, # << AÑADIR ESTO PARA LA CABECERA
     }
     return render(request, 'ferreteria/order_confirmation.html', context)
+
+
+def product_detail_view(request, product_id):
+    product = get_object_or_404(Products.objects.select_related('idcategories'), idproducts=product_id) #
+    categories = Categories.objects.all().order_by('name') # Para el sidebar, si decides incluirlo
+
+    # Lógica para el contador del carrito (similar a product_list)
+    cart_item_count = 0
+    try:
+        client = get_current_client(request) #
+        if client:
+            cart_item_count = Cart.objects.filter(idclient=client).aggregate(total_items=Sum('quantity'))['total_items'] or 0
+    except Exception:
+        pass # Mantener cart_item_count en 0 si hay error o no hay cliente
+
+    context = {
+        'product': product,
+        'categories': categories, # Opcional, si quieres mostrar el sidebar de categorías
+        'cart_item_count': cart_item_count,
+        # Puedes añadir 'current_category': product.idcategories para resaltar en el sidebar si lo usas
+    }
+    return render(request, 'ferreteria/product_detail.html', context)

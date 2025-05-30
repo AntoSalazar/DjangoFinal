@@ -362,30 +362,35 @@
             <h1>Our Products</h1>
             <div class="products-grid">
                 {% for product in products %}
-                    <div class="product-card">
-                        <div> {% if product.image %}
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}">
-                            {% else %}
-                                <div class="image-placeholder">No Image</div>
-                            {% endif %}
-                            <h3>{{ product.name }}</h3>
-                            <p class="description">{{ product.description|truncatewords:12 }}</p>
-                            <p class="price">${{ product.price|floatformat:2 }}</p>
-                        </div>
-                        <div> {% if product.stock > 0 %}
-                                <p class="stock">Stock: {{ product.stock }}</p>
-                                <form method="post" action="{% url 'add_to_cart' product.idproducts %}">
-                                    {% csrf_token %}
-                                    <label for="quantity_prod_{{ product.idproducts }}">Qty:</label>
-                                    <input type="number" name="quantity" value="1" min="1" {% if product.stock %}max="{{ product.stock }}"{% endif %} id="quantity_prod_{{ product.idproducts }}">
-                                    <button type="submit" class="btn">Add to Cart</button>
-                                </form>
-                            {% else %}
-                                <p class="out-of-stock">Out of Stock</p>
-                                <button type="button" class="btn" disabled>Add to Cart</button>
-                            {% endif %}
-                        </div>
+                <div class="product-card">
+                    <div>
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+                        {% else %}
+                            <div class="image-placeholder">No Image</div>
+                        {% endif %}
+                        <a href="{% url 'product_detail' product.idproducts %}" style="text-decoration: none; color: inherit;"><h3>{{ product.name }}</h3></a>
+                        {% if product.idcategories and product.idcategories.name %} {# Verificar que la categoría y su nombre existan #}
+                            <p class="product-category">Categoría: {{ product.idcategories.name }}</p>
+                        {% endif %}
+                        <p class="description">{{ product.description|truncatewords:12 }}</p>
+                        <p class="price">${{ product.price|floatformat:2 }}</p>
                     </div>
+                    <div>
+                        {% if product.stock > 0 %}
+                            <p class="stock">Stock: {{ product.stock }}</p>
+                            <form method="post" action="{% url 'add_to_cart' product.idproducts %}">
+                                {% csrf_token %}
+                                <label for="quantity_prod_{{ product.idproducts }}">Qty:</label>
+                                <input type="number" name="quantity" value="1" min="1" {% if product.stock %}max="{{ product.stock }}"{% endif %} id="quantity_prod_{{ product.idproducts }}">
+                                <button type="submit" class="btn">Add to Cart</button>
+                            </form>
+                        {% else %}
+                            <p class="out-of-stock">Out of Stock</p>
+                            <button type="button" class="btn" disabled>Add to Cart</button>
+                        {% endif %}
+                    </div>
+                </div>
                 {% empty %}
                     <p>No products available at the moment.</p>
                 {% endfor %}
